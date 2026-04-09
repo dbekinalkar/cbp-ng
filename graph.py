@@ -5,7 +5,7 @@ import seaborn as sns
 # ---- Config ----
 CSV_FILE = "results2.csv"
 OUTPUT_DIR = "local_predictor"
-METRIC = "p1_latency"   # Change to: extra_cycles, energy_per_inst, etc.
+METRIC = "accuracy"   # Change to: extra_cycles, energy_per_inst, etc.
 # ----------------
 
 # Load data
@@ -14,6 +14,7 @@ df = pd.read_csv(CSV_FILE)
 # Ensure numeric types
 numeric_cols = df.columns
 df[numeric_cols] = df[numeric_cols].apply(pd.to_numeric, errors='ignore')
+df["accuracy"] = 1 - (df["mispredictions"] / df["predictions"])
 
 # Create output dir
 import os
@@ -33,9 +34,46 @@ def plot_param_effect(param):
     plt.savefig(f"{OUTPUT_DIR}/{METRIC}_vs_{param}.png")
     plt.close()
 
+def plot_param_effect_split(param_x, param_split):
+    grouped = (
+        df.groupby([param_x, param_split])[METRIC]
+        .mean()
+        .reset_index()
+    )
+
+    plt.figure()
+    palette = sns.color_palette("viridis", n_colors=grouped[param_split].nunique())
+    sns.lineplot(
+        data=grouped,
+        x=param_x,
+        y=METRIC,
+        hue=param_split,
+        style=param_split,
+        markers=True,
+        palette=palette
+    )
+
+    plt.title(f"{METRIC} vs {param_x} (split by {param_split})")
+    plt.grid(True)
+
+    # Move legend outside (to the right)
+    plt.legend(
+        title=param_split,
+        bbox_to_anchor=(1.05, 1),  # push right
+        loc="upper left",
+        borderaxespad=0.
+    )
+
+    # Make room so it doesn't get cut off
+    plt.tight_layout()
+
+    plt.savefig(f"{OUTPUT_DIR}/{METRIC}_vs_{param_x}_by_{param_split}.png", bbox_inches="tight")
+    plt.close()
 for p in ["BHT_SIZE_BITS","PHT_SIZE_BITS","HIST_LEN"]:
     plot_param_effect(p)
 
+plot_param_effect_split("HIST_LEN", "BHT_SIZE_BITS")
+plot_param_effect_split("HIST_LEN", "PHT_SIZE_BITS")
 # -----------------------------------
 # 2. Heatmaps (pairwise interactions)
 # -----------------------------------
