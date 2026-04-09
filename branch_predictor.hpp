@@ -10,6 +10,8 @@
 #include "predictors/hashed_perceptron.hpp"
 #include "predictors/tutorial/tutorial.hpp"
 
+#include "predictors/local_predictor.hpp"
+
 #ifdef PREDICTOR
 using branch_predictor = PREDICTOR;
 #else

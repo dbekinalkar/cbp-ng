@@ -1,0 +1,41 @@
+#!/bin/bash
+
+# Output file
+OUTFILE="results.csv"
+
+# Write CSV header
+echo "BHT_SIZE_BITS,PHT_SIZE_BITS,HIST_LEN,trace,instructions,branches,cond_branches,predictions,extra_cycles,short_misp,block_short_misp,mispredictions,p1_latency,p2_latency,energy_per_inst" >> $OUTFILE
+
+P1_START=4
+P1_END=12
+P1_STEP=1
+
+P2_START=4
+P2_END=12
+P2_STEP=1
+
+P3_START=4
+P3_END=12
+P3_STEP=1
+
+# Parameter ranges (edit as needed)
+for ((p1=P1_START; p1<=P1_END; p1+=P1_STEP)); do
+  for ((p2=P2_START; p2<=P2_END; p2+=P2_STEP)); do
+    for ((p3=P3_START; p3<=P3_END; p3+=P3_STEP)); do
+
+      echo "Running config: <$p1,$p2,$p3>"
+
+      # Compile with template parameters
+      ./compile cbp -DPREDICTOR="local_predictor<$p1,$p2,$p3>"
+
+      # Run simulator (CSV output)
+      RESULT=$(./cbp ./gcc_test_trace.gz test 1000000 40000000)
+
+      # Append parameters + result to CSV
+      echo "$p1,$p2,$p3,$RESULT" >> $OUTFILE
+
+    done
+  done
+done
+
+echo "Done. Results saved to $OUTFILE"

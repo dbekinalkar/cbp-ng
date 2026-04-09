@@ -10,7 +10,7 @@ if [ "$NAME" == "$FILE" ]; then
     FILE="${FILE}.cpp"
 fi
 
-COMPILE="g++ -std=c++20"
+COMPILE="g++-15 -std=c++20"
 OPT="-O3"
 FLAGS="-Wall -Wextra -pedantic -Wold-style-cast -Werror -Wno-deprecated-declarations -Wno-mismatched-tags"
 
