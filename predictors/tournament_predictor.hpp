@@ -109,7 +109,7 @@ struct tournament_predictor : predictor {
 
         // For global predictor ---------------------------------------
         val<2> g_newbh = update_bh(g_bh, taken);
-        val<1> g_performing_bh_update = val<1>{g_newbh != bh};
+        val<1> g_performing_bh_update = val<1>{g_newbh != g_bh};
         need_extra_cycle(g_performing_bh_update);
         execute_if(g_performing_bh_update, [&](){
             val<MAX_SIZE> xored = branch_pc ^ g_ghr;
@@ -120,7 +120,7 @@ struct tournament_predictor : predictor {
         val<GHR_LEN> new_ghr = update_ghr(taken);
 
         // choice predictor updates
-        val<1> disagree = val<1>{bh >> 1 != g_bh >> 1};
+        val<1> disagree = val<1>{bh >> 1} != val<1>{g_bh >> 1};
         execute_if(disagree, [&](){
             val<2> t_newbh = update_bh(t_bh, val<1>{bh >> 1} == taken);
             val<1> t_performing_bh_update = val<1>{t_newbh != t_bh};
