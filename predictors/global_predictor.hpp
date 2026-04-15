@@ -39,9 +39,9 @@ struct global_predictor : predictor {
     }
 
 
-    inline void update_ghr(val<1> taken) {
+    inline val<GHR_LEN> update_ghr(val<1> taken) {
         val<GHR_LEN> shifted = ghr << hard<1>{};
-        ghr = shifted + taken;
+        return shifted + taken;
     }
 
     void update_condbr([[maybe_unused]] val<64> branch_pc, [[maybe_unused]] val<1> taken, [[maybe_unused]] val<64> next_pc)
@@ -56,7 +56,7 @@ struct global_predictor : predictor {
             bht.write(index, newbh);
         });
 
-        update_ghr(taken);
+        ghr = update_ghr(taken);
     }
 
     void update_cycle([[maybe_unused]] instruction_info &block_end_info)
