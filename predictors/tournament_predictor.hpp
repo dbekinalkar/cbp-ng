@@ -52,7 +52,7 @@ struct tournament_predictor : predictor {
 
         // TODO: SELECT BETWEEN BH >> 1 AND G_GH >> 1
         
-        val<BHT_SIZE_BITS> t_index = inst_pc.make_array(val<BHT_SIZE_BITS>{}).fold_xor();
+        val<BHT_SIZE_BITS> t_index = xored.make_array(val<BHT_SIZE_BITS>{}).fold_xor();
         t_bh = t_bht.read(t_index);
 
         chosen_bh = select(val<1>{t_bh >> 1}, bh, g_bh);
@@ -126,7 +126,8 @@ struct tournament_predictor : predictor {
             val<1> t_performing_bh_update = val<1>{t_newbh != t_bh};
             need_extra_cycle(t_performing_bh_update);
             execute_if(t_performing_bh_update, [&](){
-                val<BHT_SIZE_BITS> t_index = branch_pc.make_array(val<BHT_SIZE_BITS>{}).fold_xor();
+                val<MAX_SIZE> xored = branch_pc ^ g_ghr;
+                val<BHT_SIZE_BITS> t_index = xored.make_array(val<BHT_SIZE_BITS>{}).fold_xor();
                 t_bht.write(t_index, t_newbh);
             });
         });
