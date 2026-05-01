@@ -9,11 +9,11 @@ from datetime import datetime
 # =========================
 # CONFIG
 # =========================
-DB_PATH = "sqlite:///tage.db"
-STUDY_NAME = "tage_optimization"
+DB_PATH = "sqlite:///new_tage.db"
+STUDY_NAME = "new_tage_optimization"
 
 # Set this to whatever directory you want
-BASE_OUTPUT_DIR = "optuna_results"
+BASE_OUTPUT_DIR = "new_optuna_results"
 
 # minimize=True → lower is better
 ascending = True
