@@ -13,6 +13,7 @@
 #include "predictors/local_predictor.hpp"
 #include "predictors/global_predictor.hpp"
 #include "predictors/tournament_predictor.hpp"
+#include "predictors/new_tage.hpp"
 
 #ifdef PREDICTOR
 using branch_predictor = PREDICTOR;
