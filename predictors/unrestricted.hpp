@@ -8,8 +8,8 @@
 #include "common.hpp"
 
 using namespace hcm;
-template<u64 LOGLB=6, u64 NUMG=12, u64 LOGG=13, u64 LOGB=13, u64 TAGW=13, u64 GHIST=256, u64 LOGP1=16, u64 GHIST1=10>
 
+template<u64 LOGLB=6, u64 NUMG=12, u64 LOGG=13, u64 LOGB=13, u64 TAGW=13, u64 GHIST=256, u64 LOGP1=16, u64 GHIST1=10>
 struct unrestricted : predictor {
     // provides 2^(LOGLB-2) predictions per cycle
     // P2 is a TAGE, P1 is a gshare
@@ -19,7 +19,6 @@ struct unrestricted : predictor {
     static constexpr u64 METABITS = 4;
     static constexpr u64 UCTRBITS = 8;
     static constexpr u64 PATHBITS = 6;
-    static constexpr u64 PATHHIST = 32;
 #ifdef USE_META
     static constexpr u64 METAPIPE = 2;
 #endif
@@ -37,7 +36,6 @@ struct unrestricted : predictor {
 
     // for P1
     reg<GHIST1> global_history1;
-    reg<PATHHIST> path_history;
     reg<index1_bits> index1;
     arr<reg<1>,LINEINST> readp1; // prediction bits read from P1 table for each offset
     reg<LINEINST> p1; // P1 predictions
@@ -217,9 +215,7 @@ struct unrestricted : predictor {
 #ifdef USE_META
         meta.fanout(hard<2>{});
         arr<val<1>,NUMG> weakctr = [&](int i) {return readh[i]==hard<0>{};};
-        val<NUMG> weakbits = weakctr.fo1().concat();
-        weakbits.fanout(hard<2>{});
-        val<NUMG> coldctr = notumask & weakbits;
+        val<NUMG> coldctr = notumask & weakctr.fo1().concat();
         coldctr.fanout(hard<LINEINST>{});
         val<1> metasign = (meta[METAPIPE-1] >= hard<0>{});
         metasign.fanout(hard<LINEINST>{});
@@ -277,7 +273,6 @@ struct unrestricted : predictor {
             execute_if(actual_block, [&](){
                 next_pc.fanout(hard<2>{});
                 global_history1 = (global_history1 << 1) ^ val<GHIST1>{next_pc>>2};
-                path_history = (path_history << 1) ^ val<PATHHIST>{next_pc>>2};
                 gfolds.update(val<PATHBITS>{next_pc>>2});
                 true_block = 1;
             });
@@ -394,7 +389,6 @@ struct unrestricted : predictor {
         // do P1 and P2 agree?
         val<LINEINST> disagree_mask = (p1 ^ p2) & branch_mask.fo1();
         disagree_mask.fanout(hard<2>{});
-
         arr<val<1>,LINEINST> disagree = disagree_mask.make_array(val<1>{});
         disagree.fanout(hard<2>{});
 
@@ -532,7 +526,6 @@ struct unrestricted : predictor {
         execute_if(true_block, [&](){
             next_pc.fanout(hard<2>{});
             global_history1 = (global_history1 << 1) ^ val<GHIST1>{next_pc>>2};
-            path_history = (path_history << 1) ^ val<PATHHIST>{next_pc>>2};
             gfolds.update(val<PATHBITS>{next_pc>>2});
         });
 
