@@ -9,7 +9,7 @@
 
 using namespace hcm;
 
-template<u64 LOGLB=8, u64 NUMG=6, u64 LOGG=11, u64 LOGB=8, u64 TAGW=14, u64 GHIST=183, u64 LOGP1=11, u64 GHIST1=8>
+template<u64 LOGLB=8, u64 NUMG=13, u64 LOGG=11, u64 LOGB=8, u64 TAGW=20, u64 GHIST=234, u64 LOGP1=12, u64 GHIST1=6>
 struct new_tage : predictor {
     // provides 2^(LOGLB-2) predictions per cycle
     // P2 is a TAGE, P1 is a gshare
