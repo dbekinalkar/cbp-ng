@@ -10,7 +10,7 @@
 using namespace hcm;
 
 template<u64 LOGLB=8, u64 NUMG=6, u64 LOGG=11, u64 LOGB=8, u64 TAGW=14, u64 GHIST=183, u64 LOGP1=11, u64 GHIST1=8>
-struct tage : predictor {
+struct new_tage : predictor {
     // provides 2^(LOGLB-2) predictions per cycle
     // P2 is a TAGE, P1 is a gshare
     static_assert(LOGLB>2);
@@ -90,7 +90,7 @@ struct tage : predictor {
     ram<val<1>,(1<<index1_bits)> table1_hyst[LINEINST] {"P1 hyst"}; // P1 hysteresis
     ram<val<1>,(1<<bindex_bits)> bhyst[LINEINST] {"bhyst"}; // bimodal hysteresis
 
-    tage()
+    new_tage()
     {
 #ifdef TAGE_VERBOSE
         std::cerr << "TAGE history lengths: ";
